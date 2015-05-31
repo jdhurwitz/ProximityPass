@@ -5,3 +5,13 @@
 .DS_Store
 /build
 /captures
+
+# Vim files
+*.swp
+*.swo
+*~
+
+# Mac Files
+.DS_Store
+
+README.pdf

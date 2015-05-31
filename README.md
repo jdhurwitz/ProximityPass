@@ -1,9 +1,14 @@
-# P2PWifi-master
-<b> Simplified Protocol for Reference </b>
+P2PWifi-master
+==============
 
-Server is defined as the device that requests a file. The server will be the device to which the file is transferred.
+Simplified Protocol for Reference
+---------------------------------
 
-Client receives the ip address of the server after a connection is established. The file transfer can begin.
+Server is defined as the device that requests a file. The server will be the
+device to which the file is transferred.
+
+Client receives the ip address of the server after a connection is
+established. The file transfer can begin.
 
 Server Side
 <br>
@@ -26,5 +31,5 @@ Client side
 <br>
 -send the file
 
-Note that there is nothing defined in the simplified protocol that confirms the file was transferred successfully. 
+Note that there is nothing defined in the simplified protocol that confirms the file was transferred successfully.
 
