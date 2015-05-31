@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/src/main/res/values-v14/styles.xml -->
+    <!-- From: file:/home/nate/programming/P2PWifi-master/exp/src/main/res/values-v14/styles.xml -->
     <eat-comment/>
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar"/>
 </resources>
