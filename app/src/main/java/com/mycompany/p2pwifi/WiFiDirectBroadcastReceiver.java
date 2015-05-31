@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     public static final String TAG = "herro";
@@ -58,6 +59,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // Do whatever tasks are specific to the group owner.
                 // One common case is creating a server thread and accepting
                 // incoming connections.
+                SimpleServer server = new SimpleServer(mActivity.getApplicationContext(), null);
+                server.execute();
+
             } else if (info.groupFormed) {
                 // The other device acts as the client. In this case,
                 // you'll want to create a client thread that connects to the group

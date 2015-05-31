@@ -1,16 +1,18 @@
 package com.example.fileexplorer;
 
+import android.app.ListActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
+
 import java.io.File;
 import java.sql.Date;
-import java.util.ArrayList; 
+import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.text.DateFormat; 
-import android.os.Bundle; 
-import android.app.ListActivity;
-import android.content.Intent; 
-import android.view.View;
-import android.widget.ListView; 
 
 public class FileChooser extends ListActivity {
 
@@ -82,13 +84,27 @@ public class FileChooser extends ListActivity {
 			onFileClick(o);
 		}
 	}
-    private void onFileClick(Item o)
+
+	public String get_Ip() {
+		Intent intent = getIntent();
+		String ip = intent.getExtras().getString("serverIP");
+		return ip;
+	}
+
+		private void onFileClick(Item o)
     {
     	//Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
-    	Intent intent = new Intent();
-        intent.putExtra("GetPath",currentDir.toString());
-        intent.putExtra("GetFileName",o.getName());
-        setResult(RESULT_OK, intent);
-        finish();
+		Client client = new Client(this.getApplicationContext());
+		String host = get_Ip();
+		Log.d("file name", o.getName());
+		Log.d("host", host);
+
+		client.send_fft(host, o.getName());
+
+    	//Intent intent = new Intent();
+        //intent.putExtra("GetPath",currentDir.toString());
+        //intent.putExtra("GetFileName",o.getName());
+        //setResult(RESULT_OK, intent);
+        //finish();
     }
 }

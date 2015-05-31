@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +31,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
     private TextView statusText;
 
     public SimpleServer(Context context, View statusText) {
+
         this.context = context;
         this.statusText = (TextView) statusText;
         // this.all_transactions = new HashSet();
@@ -58,6 +61,8 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
     @Override
     protected String doInBackground(Void... params) {
         try {
+            Log.d("server", "Server has started.");
+
 
             /**
              * Create a server socket and wait for client connections. This
@@ -216,10 +221,11 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
     /**
      * Start activity that can handle the JPEG image
      */
-    //@Override
+    @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-            statusText.setText("File copied - " + result);
+            //statusText.setText("File copied - " + result);
+            Toast.makeText(context, "File copied - " + result, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent();
             intent.setAction(android.content.Intent.ACTION_VIEW);
             intent.setDataAndType(Uri.parse("file://" + result), "image/*");

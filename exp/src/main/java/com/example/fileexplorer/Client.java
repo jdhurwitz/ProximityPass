@@ -1,4 +1,4 @@
-package com.mycompany.p2pwifi;
+package com.example.fileexplorer;
 
 /**
  * Created by Jonny on 5/30/15.
@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,19 +23,22 @@ public class Client extends Activity {
     // private Set<Transaction> all_transactions;
     private static final int PORT = 8888;
     private static final int TIMEOUT = 500;
+    private Context context;
 
-    // public Client() {
-    //     this.all_transactions = new HashSet();
-    // }
+     public Client(Context context) {
+         //this.all_transactions = new HashSet();
+         this.context = context;
+     }
 
     private static String getRecipientPhone()
     {
         return "19499222058"; // TODO: fix this
     }
 
-    private static int getFileSize(String fname)
+    private static long getFileSize(String fname)
     {
-        return 2048; // TODO: fix this
+        File f = new File(fname);
+        return f.length();
     }
 
     private void send_rts(String host, String file_name)
@@ -126,17 +130,14 @@ public class Client extends Activity {
         }
     }
 
-    private void send_fft(String host, String file_name)
+    public void send_fft(String host, String file_name)
     {
-        Context context = this.getApplicationContext();
         int len;
         Socket socket = new Socket();
         byte buf[]  = new byte[1024];
         // ...
         // Set host
         // Use defined port no.
-        // Set len
-        len = 1000;
         try {
             /**
              * Create a client socket with the host,
@@ -154,11 +155,11 @@ public class Client extends Activity {
             InputStream inputstream = null;
             inputstream = cr.openInputStream(Uri.parse(file_name));
             while ((len = inputstream.read(buf)) != -1) {
-                outputstream.write(buf, 0, len);
+                outputstream.write(buf, 0, 1024);
             }
             String phone_id = "19499222058"; // hard coded for now
-            int file_size = this.getFileSize(file_name);
-            String file_size_str = Integer.toString(file_size);
+            long file_size = this.getFileSize(file_name);
+            String file_size_str = Long.toString(file_size);
             String dataString = "FFT\n"+phone_id+"\n"+file_name+"\n"+file_size_str;
             String BufString = Arrays.toString(buf);
             dataString += BufString + "\n";
