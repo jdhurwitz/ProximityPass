@@ -16,92 +16,92 @@ import java.util.List;
 
 public class FileChooser extends ListActivity {
 
-	private File currentDir;
+    private File currentDir;
     private FileArrayAdapter adapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); 
+        super.onCreate(savedInstanceState);
         currentDir = new File("/sdcard/");
-        fill(currentDir); 
+        fill(currentDir);
     }
     private void fill(File f)
     {
-    	File[]dirs = f.listFiles(); 
-		 this.setTitle("Current Dir: "+f.getName());
-		 List<Item>dir = new ArrayList<Item>();
-		 List<Item>fls = new ArrayList<Item>();
-		 try{
-			 for(File ff: dirs)
-			 { 
-				Date lastModDate = new Date(ff.lastModified()); 
-				DateFormat formater = DateFormat.getDateTimeInstance();
-				String date_modify = formater.format(lastModDate);
-				if(ff.isDirectory()){
-					
-					
-					File[] fbuf = ff.listFiles(); 
-					int buf = 0;
-					if(fbuf != null){ 
-						buf = fbuf.length;
-					} 
-					else buf = 0; 
-					String num_item = String.valueOf(buf);
-					if(buf == 0) num_item = num_item + " item";
-					else num_item = num_item + " items";
-					
-					//String formated = lastModDate.toString();
-					dir.add(new Item(ff.getName(),num_item,date_modify,ff.getAbsolutePath(),"directory_icon")); 
-				}
-				else
-				{
-					
-					fls.add(new Item(ff.getName(),ff.length() + " Byte", date_modify, ff.getAbsolutePath(),"file_icon"));
-				}
-			 }
-		 }catch(Exception e)
-		 {    
-			 
-		 }
-		 Collections.sort(dir);
-		 Collections.sort(fls);
-		 dir.addAll(fls);
-		 if(!f.getName().equalsIgnoreCase("sdcard"))
-			 dir.add(0,new Item("..","Parent Directory","",f.getParent(),"directory_up"));
-		 adapter = new FileArrayAdapter(FileChooser.this,R.layout.file_view,dir);
-		 this.setListAdapter(adapter); 
+        File[]dirs = f.listFiles();
+         this.setTitle("Current Dir: "+f.getName());
+         List<Item>dir = new ArrayList<Item>();
+         List<Item>fls = new ArrayList<Item>();
+         try{
+             for(File ff: dirs)
+             {
+                Date lastModDate = new Date(ff.lastModified());
+                DateFormat formater = DateFormat.getDateTimeInstance();
+                String date_modify = formater.format(lastModDate);
+                if(ff.isDirectory()){
+
+
+                    File[] fbuf = ff.listFiles();
+                    int buf = 0;
+                    if(fbuf != null){
+                        buf = fbuf.length;
+                    }
+                    else buf = 0;
+                    String num_item = String.valueOf(buf);
+                    if(buf == 0) num_item = num_item + " item";
+                    else num_item = num_item + " items";
+
+                    //String formated = lastModDate.toString();
+                    dir.add(new Item(ff.getName(),num_item,date_modify,ff.getAbsolutePath(),"directory_icon"));
+                }
+                else
+                {
+
+                    fls.add(new Item(ff.getName(),ff.length() + " Byte", date_modify, ff.getAbsolutePath(),"file_icon"));
+                }
+             }
+         }catch(Exception e)
+         {
+
+         }
+         Collections.sort(dir);
+         Collections.sort(fls);
+         dir.addAll(fls);
+         if(!f.getName().equalsIgnoreCase("sdcard"))
+             dir.add(0,new Item("..","Parent Directory","",f.getParent(),"directory_up"));
+         adapter = new FileArrayAdapter(FileChooser.this,R.layout.file_view,dir);
+         this.setListAdapter(adapter);
     }
     @Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
-		super.onListItemClick(l, v, position, id);
-		Item o = adapter.getItem(position);
-		if(o.getImage().equalsIgnoreCase("directory_icon")||o.getImage().equalsIgnoreCase("directory_up")){
-				currentDir = new File(o.getPath());
-				fill(currentDir);
-		}
-		else
-		{
-			onFileClick(o);
-		}
-	}
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        // TODO Auto-generated method stub
+        super.onListItemClick(l, v, position, id);
+        Item o = adapter.getItem(position);
+        if(o.getImage().equalsIgnoreCase("directory_icon")||o.getImage().equalsIgnoreCase("directory_up")){
+                currentDir = new File(o.getPath());
+                fill(currentDir);
+        }
+        else
+        {
+            onFileClick(o);
+        }
+    }
 
-	public String get_Ip() {
-		Intent intent = getIntent();
-		String ip = intent.getExtras().getString("serverIP");
-		return ip;
-	}
+    public String get_Ip() {
+        Intent intent = getIntent();
+        String ip = intent.getExtras().getString("serverIP");
+        return ip;
+    }
 
-		private void onFileClick(Item o)
+        private void onFileClick(Item o)
     {
-    	//Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
-		Client client = new Client(this.getApplicationContext());
-		String host = get_Ip();
-		Log.d("file name", o.getName());
-		Log.d("host", host);
+        //Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
+        Client client = new Client(this.getApplicationContext());
+        String host = get_Ip();
+        Log.d("file name", o.getName());
+        Log.d("host", host);
 
-		client.send_fft(host, o.getName());
+        client.send(host, o.getName());
 
-    	//Intent intent = new Intent();
+        //Intent intent = new Intent();
         //intent.putExtra("GetPath",currentDir.toString());
         //intent.putExtra("GetFileName",o.getName());
         //setResult(RESULT_OK, intent);

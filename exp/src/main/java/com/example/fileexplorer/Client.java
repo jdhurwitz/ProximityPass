@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,15 +22,49 @@ import java.util.Arrays;
 
 public class Client extends Activity {
 
-    // private Set<Transaction> all_transactions;
     private static final int PORT = 8888;
     private static final int TIMEOUT = 500;
     private Context context;
 
-     public Client(Context context) {
-         //this.all_transactions = new HashSet();
-         this.context = context;
-     }
+    private class Sender extends AsyncTask<Void,Void,String> {
+        // On construction, start sending
+        private String host;
+        private String file_name;
+        public Sender(String host, String file_name)
+        {
+            this.host = host;
+            this.file_name = file_name;
+        }
+
+        @Override
+        protected String doInBackground(Void... params)
+        {
+            Toast.makeText(context, "Sending your file", Toast.LENGTH_SHORT).show();
+            return send_fft(this.host, this.file_name);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                //statusText.setText("File copied - " + result);
+                Toast.makeText(context, "File sent", Toast.LENGTH_SHORT).show();
+                // Intent intent = new Intent();
+                // intent.setAction(android.content.Intent.ACTION_VIEW);
+                // intent.setDataAndType(Uri.parse("file://" + result), "image/*");
+                // context.startActivity(intent);
+            }
+        }
+    }
+
+    public Client(Context context) {
+        this.context = context;
+    }
+
+    public void send(String host, String file_name)
+    {
+        Sender s = new Sender(host, file_name);
+        s.execute();
+    }
 
     private static String getRecipientPhone()
     {
@@ -130,7 +166,7 @@ public class Client extends Activity {
         }
     }
 
-    public void send_fft(String host, String file_name)
+    public String send_fft(String host, String file_name)
     {
         int len;
         Socket socket = new Socket();
@@ -157,6 +193,7 @@ public class Client extends Activity {
             while ((len = inputstream.read(buf)) != -1) {
                 outputstream.write(buf, 0, 1024);
             }
+            Toast.makeText(this.context, "Finished reading file", Toast.LENGTH_SHORT).show();
             String phone_id = "19499222058"; // hard coded for now
             long file_size = this.getFileSize(file_name);
             String file_size_str = Long.toString(file_size);
@@ -185,12 +222,14 @@ public class Client extends Activity {
                 if (socket.isConnected()) {
                     try {
                         socket.close();
+                        return "Success";
                     } catch (IOException e) {
                         //catch logic
                     }
                 }
             }
         }
+        return null;
     }
 
     private void send_rtp(String host, String file_name)

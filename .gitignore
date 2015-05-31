@@ -6,12 +6,12 @@
 /build
 /captures
 
+# Java files
+*.class
+
 # Vim files
 *.swp
 *.swo
 *~
-
-# Mac Files
-.DS_Store
 
 README.pdf
