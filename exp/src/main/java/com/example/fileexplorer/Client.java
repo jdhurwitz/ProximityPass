@@ -208,7 +208,7 @@ public class Client extends Activity {
             String file_size_str = Long.toString(file_size);
             String dataString = "FFT\n"+phone_id+"\n"+file_name+"\n"+file_size_str;
             String BufString = Arrays.toString(buf);
-            dataString += BufString + "\n";
+            dataString += BufString;
             byte outputBuf[] = dataString.getBytes();
             outputstream.write(outputBuf, 0, len);
             outputstream.close();

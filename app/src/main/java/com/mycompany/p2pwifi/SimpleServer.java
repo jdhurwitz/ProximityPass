@@ -93,7 +93,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
             // Log.d("Server", "file_name" + file_name);
             // Log.d("Server", "file_size_str" + file_size_str);
             int ch;
-            int newlineByte = '\n';
+            int newlineByte = Character.getNumericValue('\n');
             String request_type = "";
             while ( (ch = clientInput.read()) != newlineByte)
                 request_type += (char)ch;
