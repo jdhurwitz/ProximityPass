@@ -23,7 +23,7 @@ public class FileChooser extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentDir = new File(Environment.getExternalStorageDirectory(), "/sdcard/");
+        currentDir = new File(Environment.getExternalStorageDirectory(), "");
         fill(currentDir);
     }
     private void fill(File f)
@@ -98,11 +98,11 @@ public class FileChooser extends ListActivity {
         //Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
         Client client = new Client(this.getApplicationContext());
 
-		String host = get_Ip();
-		String path = currentDir + "/" + o.getName();
-		Toast.makeText(this, path, Toast.LENGTH_LONG).show();
+        String host = get_Ip();
+        String path = currentDir + "/" + o.getName();
+        Toast.makeText(this, path, Toast.LENGTH_LONG).show();
 
-		Log.d("file path", path );
+        Log.d("file path", path );
         Log.d("host", host);
 
         client.send(host, path);

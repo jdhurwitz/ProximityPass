@@ -10,6 +10,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.Toast;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,8 +40,11 @@ public class Client extends Activity {
         @Override
         protected String doInBackground(Void... params)
         {
-            Toast.makeText(context, "Sending your file", Toast.LENGTH_SHORT).show();
-            return send_fft(this.host, this.file_name);
+            // Toast.makeText(context, "Sending your file", Toast.LENGTH_SHORT).show();
+            Log.d("Client", "Starting fft: " + this.host + " : " + this.file_name);
+            String ret = send_fft(this.host, this.file_name);
+            Log.d("Client", "Finished fft: " + ret);
+            return ret;
         }
 
         @Override
@@ -168,6 +172,7 @@ public class Client extends Activity {
 
     public String send_fft(String host, String file_name)
     {
+        Log.d("Client", "File is: " + file_name);
         int len;
         Socket socket = new Socket();
         byte buf[]  = new byte[1024];
@@ -189,12 +194,16 @@ public class Client extends Activity {
             OutputStream outputstream = socket.getOutputStream();
             ContentResolver cr = context.getContentResolver();
             InputStream inputstream = null;
-            inputstream = cr.openInputStream(Uri.parse(file_name));
+            Uri tmp = Uri.parse("file://"+file_name);
+            inputstream = cr.openInputStream(tmp);
+            Log.d("Client", "Before while loop");
             while ((len = inputstream.read(buf)) != -1) {
                 outputstream.write(buf, 0, 1024);
             }
-            Toast.makeText(this.context, "Finished reading file", Toast.LENGTH_SHORT).show();
+            Log.d("Client", "After while loop");
+            // Toast.makeText(this.context, "Finished reading file", Toast.LENGTH_SHORT).show();
             String phone_id = "19499222058"; // hard coded for now
+            Log.d("Client", "Before getFileSize");
             long file_size = this.getFileSize(file_name);
             String file_size_str = Long.toString(file_size);
             String dataString = "FFT\n"+phone_id+"\n"+file_name+"\n"+file_size_str;
@@ -209,7 +218,9 @@ public class Client extends Activity {
 
         } catch (FileNotFoundException e) {
             //catch logic
+            Log.d("Client", "FileNotFound: " + e.getMessage());
         } catch (IOException e) {
+            Log.d("Client", "IO exception: " + e.getMessage());
             //catch logic
         }
 

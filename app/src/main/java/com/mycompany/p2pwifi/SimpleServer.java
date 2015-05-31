@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -79,19 +81,34 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
             InputStream clientInput = client.getInputStream();
             OutputStream outputstream = client.getOutputStream();
 
+            // InputStreamReader isr = new  InputStreamReader(clientInput);
+            // BufferedReader ir = new BufferedReader(isr);
+
+            // String request_type = ir.readLine();
+            // String phone_no = ir.readLine();
+            // String file_name = ir.readLine();
+            // String file_size_str = ir.readLine();
+            // Log.d("Server", "request_type" + request_type);
+            // Log.d("Server", "phone_no" + phone_no);
+            // Log.d("Server", "file_name" + file_name);
+            // Log.d("Server", "file_size_str" + file_size_str);
             int ch;
+            int newlineByte = '\n';
             String request_type = "";
-            while ( (ch = clientInput.read()) != '\n')
-                request_type += ch;
+            while ( (ch = clientInput.read()) != newlineByte)
+                request_type += (char)ch;
+            Log.d("Server", "Request: " + request_type);
             String phone_no = "";
-            while ( (ch = clientInput.read()) != '\n')
-                phone_no += ch;
+            while ( (ch = clientInput.read()) != newlineByte)
+                phone_no += (char)ch;
             String file_name = "";
-            while ( (ch = clientInput.read()) != '\n')
-                file_name += ch;
+            while ( (ch = clientInput.read()) != newlineByte)
+                file_name += (char)ch;
+            Log.d("Server", "File name: " + file_name);
             String file_size_str = "";
-            while ( (ch = clientInput.read()) != '\n')
-                file_size_str += ch;
+            while ( (ch = clientInput.read()) != newlineByte)
+                file_size_str += (char)ch;
+            Log.d("Server", file_size_str);
             int file_size = Integer.parseInt(file_size_str);
 
             // // Build a Transaction
@@ -194,8 +211,8 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 // }
 
                 // save file
-                final File f = new File(Environment.getExternalStorageDirectory() + "/"
-                        + context.getPackageName() + "/ProximityPass/" + file_name);
+                final File f = new File(Environment.getExternalStorageDirectory()
+                        + "/ProximityPass/" + file_name);
 
                 File dirs = new File(f.getParent());
                 if (!dirs.exists())
@@ -214,6 +231,9 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
             return null;
         } catch (IOException e) {
             //Log.e(WiFiDirectActivity.TAG, e.getMessage());
+            return null;
+        } catch (NumberFormatException e) {
+            Log.d("Server", e.getMessage());
             return null;
         }
     }
