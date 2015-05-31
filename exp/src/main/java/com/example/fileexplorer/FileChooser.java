@@ -3,9 +3,11 @@ package com.example.fileexplorer;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.sql.Date;
@@ -21,7 +23,7 @@ public class FileChooser extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentDir = new File("/sdcard/");
+        currentDir = new File(Environment.getExternalStorageDirectory(), "/sdcard/");
         fill(currentDir);
     }
     private void fill(File f)
@@ -95,11 +97,15 @@ public class FileChooser extends ListActivity {
     {
         //Toast.makeText(this, "Folder Clicked: "+ currentDir, Toast.LENGTH_SHORT).show();
         Client client = new Client(this.getApplicationContext());
-        String host = get_Ip();
-        Log.d("file name", o.getName());
+
+		String host = get_Ip();
+		String path = currentDir + "/" + o.getName();
+		Toast.makeText(this, path, Toast.LENGTH_LONG).show();
+
+		Log.d("file path", path );
         Log.d("host", host);
 
-        client.send(host, o.getName());
+        client.send(host, path);
 
         //Intent intent = new Intent();
         //intent.putExtra("GetPath",currentDir.toString());
