@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- From: file:/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/build/intermediates/bundles/debug/res/values-v11/values-v11.xml -->
-    <eat-comment/>
-    <style name="AppTheme" parent="android:Theme.Holo.Light"/>
-</resources>

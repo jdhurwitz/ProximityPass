@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="22.1.1"><source path="/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/assets"/></dataSet><dataSet config="debug"><source path="/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/build/intermediates/bundles/debug/assets"/></dataSet><dataSet config="main"><source path="/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/src/androidTest/assets"/></dataSet></merger>
