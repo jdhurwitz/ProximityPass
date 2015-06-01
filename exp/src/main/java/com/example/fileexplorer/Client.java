@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.Toast;
 import android.util.Log;
+import android.telephony.TelephonyManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -70,9 +71,11 @@ public class Client extends Activity {
         s.execute();
     }
 
-    private static String getRecipientPhone()
+    private String getMyPhoneNumber()
     {
-        return "19499222058"; // TODO: fix this
+        TelephonyManager tMgr = (TelephonyManager)this.context.getSystemService(Context.TELEPHONY_SERVICE);
+        String ret = tMgr.getLine1Number();
+        return ret;
     }
 
     private static long getFileSize(String fname)
@@ -102,7 +105,7 @@ public class Client extends Activity {
 
             OutputStream outputstream = socket.getOutputStream();
             InputStream  server_resp  = socket.getInputStream();
-            String phone_id = "19499222058"; // hard coded for now
+            String phone_id = getMyPhoneNumber();
             int file_size = 2048; // hard coded for now
             String file_size_str = Integer.toString(file_size);
             String dataString = "RTS\n"+phone_id+"\n"+file_name+"\n"+file_size_str+"\n";
@@ -184,8 +187,10 @@ public class Client extends Activity {
              * Create a client socket with the host,
              * port, and timeout information.
              */
+            Log.d("Test", "Before binding");
             socket.bind(null);
             socket.connect((new InetSocketAddress(host, PORT)), 500);
+            Log.d("Test", "After connecting");
 
             // /**
             //  * Create a byte stream from a JPEG file and pipe it to the output stream
@@ -194,9 +199,21 @@ public class Client extends Activity {
             OutputStream network_output = socket.getOutputStream();
             ContentResolver cr = context.getContentResolver();
             InputStream file_in_stream;
+            Log.d("Test", "Before parsing");
             Uri tmp = Uri.parse("file://"+file_name);
             file_in_stream = cr.openInputStream(tmp);
-            String phone_id = "19499222058"; // hard coded for now
+            Log.d("Test", "After input stream");
+            String phone_id = "";
+            try
+            {
+                phone_id = getMyPhoneNumber();
+            }
+            catch (Exception e)
+            {
+                Log.d("Error", e.toString() );
+            }
+            Log.d("Test", "After phone number");
+            Log.d("Phone id", phone_id);
             Log.d("Client", "Before getFileSize");
             long file_size = this.getFileSize(file_name);
             String file_size_str = Long.toString(file_size);
@@ -206,14 +223,25 @@ public class Client extends Activity {
 
             // We've now completed the header
             Log.d("Client", "headerString: " + headerString);
-            Log.d("Client", "Before while loop");
             String dataString = ""; // initialize empty
-            while ((len = file_in_stream.read(buf)) != -1) {
-                // network_output.write(buf, 0, 1024);
+            Log.d("Client", "Before while loop");
+            try
+            {
+                while ((len = file_in_stream.read(buf)) != -1) {
+                    // network_output.write(buf, 0, 1024);
 
-                // buf stores the next several bytes from the file
-                String BufString = Arrays.toString(buf);
-                dataString += BufString;
+                    // buf stores the next several bytes from the file
+
+                    // Put a zero byte in there
+                    // buf[len] = 0;
+                    String BufString = new String(buf);
+                    Log.d("Buffer:", BufString);
+                    dataString += BufString;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.d("Error", e.toString() );
             }
             Log.d("Client", "After while loop");
             // Toast.makeText(this.context, "Finished reading file", Toast.LENGTH_SHORT).show();
@@ -285,7 +313,7 @@ public class Client extends Activity {
             // while ((len = inputstream.read(buf)) != -1) {
             //     outputstream.write(buf, 0, len);
             // }
-            String phone_id = "19499222058"; // hard coded for now
+            String phone_id = getMyPhoneNumber();
             int file_size = 2048; // hard coded for now
             String file_size_str = Integer.toString(file_size);
             String dataString = "RTP\n"+phone_id+"\n"+file_name+"\n"+file_size_str+"\n";

@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Arrays;
+import android.telephony.TelephonyManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +41,13 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
         // this.all_transactions = new HashSet();
     }
 
+    private String getMyPhoneNumber()
+    {
+        TelephonyManager tMgr = (TelephonyManager)this.context.getSystemService(Context.TELEPHONY_SERVICE);
+        String ret = tMgr.getLine1Number();
+        return ret;
+    }
+
     public static boolean copyStream(InputStream in, OutputStream out, int maxSize) {
         int bufSize = 1024;
         byte buf[] = new byte[bufSize];
@@ -53,8 +62,9 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
             // }
             while ((len = in.read(buf)) != -1 && amt_read < maxSize)
             {
-                out.write(buf, 0, bufSize);
-                amt_read += bufSize;
+                out.write(buf, 0, len);
+                Log.d("Buffer:", new String(buf) );
+                amt_read += len;
             }
             out.close();
             in.close();
@@ -143,7 +153,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 // Assume we must get user approval
                 boolean approval = true; // hard coded for now
 
-                String my_phone_no = "123456789"; // TODO
+                String my_phone_no = getMyPhoneNumber();
                 if (approval)
                 {
                     // Send CTS
@@ -174,7 +184,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 // get user approval
                 boolean approval = true; // hard coded for now
 
-                String my_phone_no = "123456789"; // TODO
+                String my_phone_no = getMyPhoneNumber();
                 if (approval)
                 {
                     // Send CTS
@@ -238,6 +248,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
 
                 // remove transaction
 
+                // Indicate success with the filepath
                 return f.getAbsolutePath();
             }
             else
