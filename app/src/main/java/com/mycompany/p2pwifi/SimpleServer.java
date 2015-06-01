@@ -189,8 +189,8 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                     String dataString = "CTS\n"+my_phone_no+"\n"+file_name+"\n"+file_size_str+"\n";
                     byte buf[] = dataString.getBytes();
                     outputstream.write(buf);
-                    outputstream.close();
                 }
+                outputstream.close();
 
                 // update transaction
             }
