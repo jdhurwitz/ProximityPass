@@ -46,10 +46,15 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
         int amt_read = 0;
         try {
             // Loop, but not indefinitely (see maxSize)
+            // while ((len = in.read(buf)) != -1 && amt_read < maxSize)
+            // {
+            //     out.write(buf, 0, len);
+            //     amt_read += len;
+            // }
             while ((len = in.read(buf)) != -1 && amt_read < maxSize)
             {
-                out.write(buf, 0, len);
-                amt_read += len;
+                out.write(buf, 0, bufSize);
+                amt_read += bufSize;
             }
             out.close();
             in.close();
@@ -93,11 +98,11 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
             // Log.d("Server", "file_name" + file_name);
             // Log.d("Server", "file_size_str" + file_size_str);
             int ch;
-            int newlineByte = Character.getNumericValue('\n');
+            int newlineByte = '\n';
             String request_type = "";
             while ( (ch = clientInput.read()) != newlineByte)
                 request_type += (char)ch;
-            Log.d("Server", "Request: " + request_type);
+            Log.d("Server", "Request: <" + request_type + ">");
             String phone_no = "";
             while ( (ch = clientInput.read()) != newlineByte)
                 phone_no += (char)ch;
@@ -110,6 +115,10 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 file_size_str += (char)ch;
             Log.d("Server", file_size_str);
             int file_size = Integer.parseInt(file_size_str);
+            if (file_size == 5)
+                Log.d("File size", "File size converted to 5");
+            else
+                Log.d("File size", "File size is wrong");
 
             // // Build a Transaction
             // Transaction cur = new Transaction(phone_no, file_name, file_size);
@@ -123,8 +132,9 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
             // }
 
             // Handle different requests differently
-            if (request_type == "RTS")
+            if (request_type.equals("RTS") )
             {
+                Log.d("FFT", "You reached rts");
                 // // create transaction
                 // cur.updateStage(0);
                 // all_transactions.add(cur);
@@ -150,8 +160,9 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 // cur.updateStage(1);
                 // all_transactions.add(cur);
             }
-            else if (request_type == "RTP")
+            else if (request_type.equals("RTP") )
             {
+                Log.d("FFT", "You reached rtp");
                 // // update transaction
                 // if (!all_transactions.contains(cur))
                 // {
@@ -177,8 +188,9 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
 
                 // update transaction
             }
-            else if (request_type == "FFT")
+            else if (request_type.equals("FFT") )
             {
+                Log.d("FFT", "You reached FFT");
                 // // update transaction
                 // if (!all_transactions.contains(cur))
                 // {
@@ -216,17 +228,21 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
 
                 File dirs = new File(f.getParent());
                 if (!dirs.exists())
+                {
+                    Log.d("File saving", "Creating your directories right now");
                     dirs.mkdirs();
+                }
                 f.createNewFile();
                 copyStream(clientInput, new FileOutputStream(f), file_size); // TODO: Make this copy only file_size bytes
                 serverSocket.close();
-
-                // display message saying it was successful
 
                 // remove transaction
 
                 return f.getAbsolutePath();
             }
+            else
+                Log.d("FFT", "You reached      ELSE CASE");
+
 
             return null;
         } catch (IOException e) {
@@ -246,10 +262,10 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
         if (result != null) {
             //statusText.setText("File copied - " + result);
             Toast.makeText(context, "File copied - " + result, Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent();
-            intent.setAction(android.content.Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.parse("file://" + result), "image/*");
-            context.startActivity(intent);
+            // Intent intent = new Intent();
+            // intent.setAction(android.content.Intent.ACTION_VIEW);
+            // intent.setDataAndType(Uri.parse("file://" + result), "image/*");
+            // context.startActivity(intent);
         }
     }
 }

@@ -191,30 +191,42 @@ public class Client extends Activity {
             //  * Create a byte stream from a JPEG file and pipe it to the output stream
             //  * of the socket. This data will be retrieved by the server device.
             //  */
-            OutputStream outputstream = socket.getOutputStream();
+            OutputStream network_output = socket.getOutputStream();
             ContentResolver cr = context.getContentResolver();
-            InputStream inputstream = null;
+            InputStream file_in_stream;
             Uri tmp = Uri.parse("file://"+file_name);
-            inputstream = cr.openInputStream(tmp);
-            Log.d("Client", "Before while loop");
-            while ((len = inputstream.read(buf)) != -1) {
-                outputstream.write(buf, 0, 1024);
-            }
-            Log.d("Client", "After while loop");
-            // Toast.makeText(this.context, "Finished reading file", Toast.LENGTH_SHORT).show();
+            file_in_stream = cr.openInputStream(tmp);
             String phone_id = "19499222058"; // hard coded for now
             Log.d("Client", "Before getFileSize");
             long file_size = this.getFileSize(file_name);
             String file_size_str = Long.toString(file_size);
-            String dataString = "FFT\n"+phone_id+"\n"+file_name+"\n"+file_size_str;
-            String BufString = Arrays.toString(buf);
-            dataString += BufString;
-            byte outputBuf[] = dataString.getBytes();
-            outputstream.write(outputBuf, 0, len);
-            outputstream.close();
-            inputstream.close();
+            File f = new File(file_name);
+            String short_name = f.getName();
+            String headerString = "FFT\n"+phone_id+"\n"+short_name+"\n"+file_size_str+"\n";
 
-            // No response to FFT
+            // We've now completed the header
+            Log.d("Client", "headerString: " + headerString);
+            Log.d("Client", "Before while loop");
+            String dataString = ""; // initialize empty
+            while ((len = file_in_stream.read(buf)) != -1) {
+                // network_output.write(buf, 0, 1024);
+
+                // buf stores the next several bytes from the file
+                String BufString = Arrays.toString(buf);
+                dataString += BufString;
+            }
+            Log.d("Client", "After while loop");
+            // Toast.makeText(this.context, "Finished reading file", Toast.LENGTH_SHORT).show();
+            // Now dataString is complete
+            String outputString = headerString + dataString;
+            byte outputBuf[] = outputString.getBytes();
+            // network_output.write(outputBuf, 0, 1024);
+            network_output.write(outputBuf); // Write entire buffer to network
+
+            network_output.close();
+            file_in_stream.close();
+
+            // FFT requests receive no response, so don't listen for one
 
         } catch (FileNotFoundException e) {
             //catch logic
