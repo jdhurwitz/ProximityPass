@@ -187,10 +187,8 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 {
                     // Send CTS
                     String dataString = "CTS\n"+my_phone_no+"\n"+file_name+"\n"+file_size_str+"\n";
-                    byte buf[] = new byte[1024];
-                    int len = 1000;
-                    buf = dataString.getBytes();
-                    outputstream.write(buf, 0, len);
+                    byte buf[] = dataString.getBytes();
+                    outputstream.write(buf);
                     outputstream.close();
                 }
 

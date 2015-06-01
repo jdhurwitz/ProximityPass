@@ -104,10 +104,6 @@ public class Client extends Activity {
             //  */
             OutputStream network_output = socket.getOutputStream();
             InputStream  server_resp  = socket.getInputStream();
-            ContentResolver cr = context.getContentResolver();
-            InputStream file_in_stream;
-            Uri tmp = Uri.parse("file://"+file_name);
-            file_in_stream = cr.openInputStream(tmp);
             String phone_id = "";
             try
             {
@@ -297,17 +293,12 @@ public class Client extends Activity {
         return null;
     }
 
-    private void send_rtp(String host, String file_name)
+    private String send_rtp(String host, String file_name)
     {
+        String ret = null;
         Context context = this.getApplicationContext();
-        int len;
         Socket socket = new Socket();
         byte buf[]  = new byte[1024];
-        // ...
-        // Set host
-        // Use defined port no.
-        // Set len
-        len = 1000;
         try {
             /**
              * Create a client socket with the host,
@@ -320,45 +311,61 @@ public class Client extends Activity {
             //  * Create a byte stream from a JPEG file and pipe it to the output stream
             //  * of the socket. This data will be retrieved by the server device.
             //  */
-            OutputStream outputstream = socket.getOutputStream();
-            // ContentResolver cr = context.getContentResolver();
-            // InputStream inputstream = null;
-            // inputstream = cr.openInputStream(Uri.parse("path/to/picture.jpg"));
-            // while ((len = inputstream.read(buf)) != -1) {
-            //     outputstream.write(buf, 0, len);
-            // }
-            String phone_id = getMyPhoneNumber();
-            int file_size = 2048; // hard coded for now
-            String file_size_str = Integer.toString(file_size);
-            String dataString = "RTP\n"+phone_id+"\n"+file_name+"\n"+file_size_str+"\n";
-            buf = dataString.getBytes();
-            outputstream.write(buf, 0, len);
-            outputstream.close();
+            OutputStream network_output = socket.getOutputStream();
+            InputStream server_resp = socket.getInputStream();
+            String phone_id = "";
+            try
+            {
+                phone_id = getMyPhoneNumber();
+            }
+            catch (Exception e)
+            {
+                Log.d("Error", e.toString() );
+            }
+            long file_size = this.getFileSize(file_name);
+            String file_size_str = Long.toString(file_size);
+            File f = new File(file_name);
+            String short_name = f.getName();
+            String headerString = "RTP\n"+phone_id+"\n"+short_name+"\n"+file_size_str+"\n";
+
+            // We've now completed the header
+
+            Log.d("Client", "headerString: " + headerString);
+
+            // Generate a thumbnail
+
+            // Read in the thumbnail
+            String dataString = "";
+
+            String outputString = headerString + dataString;
+            byte outputBuf[] = outputString.getBytes();
+            network_output.write(outputBuf);
+            network_output.close();
+
             // Parse response
-            InputStream respStream = socket.getInputStream();
 
             int ch;
             String resp_type = "";
-            while ( (ch = respStream.read()) != '\n')
-                resp_type += ch;
+            while ( (ch = server_resp.read()) != '\n')
+                resp_type += (char)ch;
             String phone_no = "";
-            while ( (ch = respStream.read()) != '\n')
-                phone_no += ch;
+            while ( (ch = server_resp.read()) != '\n')
+                phone_no += (char)ch;
             String resp_fname = "";
-            while ( (ch = respStream.read()) != '\n')
-                resp_fname += ch;
+            while ( (ch = server_resp.read()) != '\n')
+                resp_fname += (char)ch;
             String resp_fsize_str = "";
-            while ( (ch = respStream.read()) != '\n')
-                resp_fsize_str += ch;
+            while ( (ch = server_resp.read()) != '\n')
+                resp_fsize_str += (char)ch;
             int resp_fsize = Integer.parseInt(resp_fsize_str);
 
             // Test for valid response
-            if (resp_fname == file_name
+            if (resp_fname.equals(file_name)
                     && resp_fsize == file_size)
             {
                 // This is so far OK
-                if (resp_type == "CTS")
-                    send_fft(host, file_name);
+                if (resp_type.equals("CTS") )
+                    ret = send_fft(host, file_name);
                 else
                 {
                     // This is an error case
@@ -385,11 +392,13 @@ public class Client extends Activity {
                 if (socket.isConnected()) {
                     try {
                         socket.close();
+                        return ret;
                     } catch (IOException e) {
                         //catch logic
                     }
                 }
             }
         }
+        return null;
     }
 }
