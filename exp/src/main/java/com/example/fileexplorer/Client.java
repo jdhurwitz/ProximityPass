@@ -84,65 +84,86 @@ public class Client extends Activity {
         return f.length();
     }
 
-    private void send_rts(String host, String file_name)
+    private String send_rts(String host, String file_name)
     {
+        String ret = null;
         Context context = this.getApplicationContext();
-        int len;
         Socket socket = new Socket();
         byte buf[]  = new byte[1024];
-        // ...
-        // Set host
-        // Use defined port no.
-        // Set len
-        len = 1000;
         try {
             /**
              * Create a client socket with the host,
              * port, and timeout information.
              */
             socket.bind(null);
-            socket.connect((new InetSocketAddress(host, PORT)), TIMEOUT);
+            socket.connect((new InetSocketAddress(host, PORT)), 500);
 
-            OutputStream outputstream = socket.getOutputStream();
+            // /**
+            //  * Create a byte stream from a JPEG file and pipe it to the output stream
+            //  * of the socket. This data will be retrieved by the server device.
+            //  */
+            OutputStream network_output = socket.getOutputStream();
             InputStream  server_resp  = socket.getInputStream();
-            String phone_id = getMyPhoneNumber();
-            int file_size = 2048; // hard coded for now
-            String file_size_str = Integer.toString(file_size);
-            String dataString = "RTS\n"+phone_id+"\n"+file_name+"\n"+file_size_str+"\n";
-            buf = dataString.getBytes();
-            outputstream.write(buf, 0, len);
-            outputstream.close();
-            // Parse response
-            InputStream respStream = socket.getInputStream();
+            ContentResolver cr = context.getContentResolver();
+            InputStream file_in_stream;
+            Uri tmp = Uri.parse("file://"+file_name);
+            file_in_stream = cr.openInputStream(tmp);
+            String phone_id = "";
+            try
+            {
+                phone_id = getMyPhoneNumber();
+            }
+            catch (Exception e)
+            {
+                Log.d("Error", e.toString() );
+            }
+            long file_size = this.getFileSize(file_name);
+            String file_size_str = Long.toString(file_size);
+            File f = new File(file_name);
+            String short_name = f.getName();
+            String headerString = "RTS\n"+phone_id+"\n"+short_name+"\n"+file_size_str+"\n";
 
-            String resp_fname = "";
+            // We've now completed the header
+            Log.d("Client", "headerString: " + headerString);
+            byte outputBuf[] = headerString.getBytes();
+            network_output.write(outputBuf);
+
+            InputStream respStream = socket.getInputStream();
             int ch;
             String resp_type = "";
             while ( (ch = server_resp.read()) != '\n')
-                resp_type += ch;
+                resp_type += (char)ch;
             String phone_no = "";
             while ( (ch = server_resp.read()) != '\n')
-                phone_no += ch;
+                phone_no += (char)ch;
+            String resp_fname = "";
             while ( (ch = server_resp.read()) != '\n')
-                resp_fname += ch;
+                resp_fname += (char)ch;
             String resp_fsize_str = "";
             while ( (ch = server_resp.read()) != '\n')
-                resp_fsize_str += ch;
+                resp_fsize_str += (char)ch;
             int resp_fsize = Integer.parseInt(resp_fsize_str);
 
             // Test for valid response
-            if (resp_fname == file_name
+            if (resp_fname.equals(file_name)
                     && resp_fsize == file_size)
             {
                 // This is so far OK
-                if (resp_type == "CTS")
-                    send_fft(host, file_name);
-                else if (resp_type == "RFP")
+                if (resp_type.equals("CTS") )
+                {
+                    Log.d("CTS", "Confirm to send");
+                    ret = send_fft(host, file_name);
+                }
+                else if (resp_type.equals("RFP") )
+                {
+                    Log.d("RFP", "Request for preview");
                     send_rtp(host, file_name);
+                }
                 else
                 {
                     // This is an error case
                     // TODO: handle this
+                    Log.d("Error", "This is an error case");
                 }
             }
             else
@@ -165,12 +186,14 @@ public class Client extends Activity {
                 if (socket.isConnected()) {
                     try {
                         socket.close();
+                        return ret;
                     } catch (IOException e) {
                         //catch logic
                     }
                 }
             }
         }
+        return null;
     }
 
     public String send_fft(String host, String file_name)
@@ -187,10 +210,8 @@ public class Client extends Activity {
              * Create a client socket with the host,
              * port, and timeout information.
              */
-            Log.d("Test", "Before binding");
             socket.bind(null);
             socket.connect((new InetSocketAddress(host, PORT)), 500);
-            Log.d("Test", "After connecting");
 
             // /**
             //  * Create a byte stream from a JPEG file and pipe it to the output stream
@@ -199,10 +220,8 @@ public class Client extends Activity {
             OutputStream network_output = socket.getOutputStream();
             ContentResolver cr = context.getContentResolver();
             InputStream file_in_stream;
-            Log.d("Test", "Before parsing");
             Uri tmp = Uri.parse("file://"+file_name);
             file_in_stream = cr.openInputStream(tmp);
-            Log.d("Test", "After input stream");
             String phone_id = "";
             try
             {
@@ -212,9 +231,6 @@ public class Client extends Activity {
             {
                 Log.d("Error", e.toString() );
             }
-            Log.d("Test", "After phone number");
-            Log.d("Phone id", phone_id);
-            Log.d("Client", "Before getFileSize");
             long file_size = this.getFileSize(file_name);
             String file_size_str = Long.toString(file_size);
             File f = new File(file_name);
@@ -232,8 +248,6 @@ public class Client extends Activity {
 
                     // buf stores the next several bytes from the file
 
-                    // Put a zero byte in there
-                    // buf[len] = 0;
                     String BufString = new String(buf);
                     Log.d("Buffer:", BufString);
                     dataString += BufString;
