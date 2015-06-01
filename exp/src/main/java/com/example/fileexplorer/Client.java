@@ -43,7 +43,7 @@ public class Client extends Activity {
         {
             // Toast.makeText(context, "Sending your file", Toast.LENGTH_SHORT).show();
             Log.d("Client", "Starting fft: " + this.host + " : " + this.file_name);
-            String ret = send_fft(this.host, this.file_name);
+            String ret = send_rts(this.host, this.file_name);
             Log.d("Client", "Finished fft: " + ret);
             return ret;
         }
@@ -86,10 +86,11 @@ public class Client extends Activity {
 
     private String send_rts(String host, String file_name)
     {
+        Log.d("RTS", "Beginning");
         String ret = null;
-        Context context = this.getApplicationContext();
         Socket socket = new Socket();
         byte buf[]  = new byte[1024];
+        Log.d("RTS", "Before try");
         try {
             /**
              * Create a client socket with the host,
@@ -104,6 +105,7 @@ public class Client extends Activity {
             //  */
             OutputStream network_output = socket.getOutputStream();
             InputStream  server_resp  = socket.getInputStream();
+            Log.d("RTS", "Before phone");
             String phone_id = "";
             try
             {
@@ -129,21 +131,26 @@ public class Client extends Activity {
             String resp_type = "";
             while ( (ch = server_resp.read()) != '\n')
                 resp_type += (char)ch;
+            Log.d("Response", resp_type);
             String phone_no = "";
             while ( (ch = server_resp.read()) != '\n')
                 phone_no += (char)ch;
+            Log.d("Response", phone_no);
             String resp_fname = "";
             while ( (ch = server_resp.read()) != '\n')
                 resp_fname += (char)ch;
+            Log.d("Response", resp_fname);
             String resp_fsize_str = "";
             while ( (ch = server_resp.read()) != '\n')
                 resp_fsize_str += (char)ch;
             int resp_fsize = Integer.parseInt(resp_fsize_str);
+            Log.d("Response", resp_fsize_str);
 
             // Test for valid response
-            if (resp_fname.equals(file_name)
+            if (resp_fname.equals(short_name)
                     && resp_fsize == file_size)
             {
+                Log.d("EQUAL", "correct file and size");
                 // This is so far OK
                 if (resp_type.equals("CTS") )
                 {
@@ -164,9 +171,13 @@ public class Client extends Activity {
             }
             else
             {
+                Log.d("Error", "Wrong size");
+                Log.d("Fname", file_name);
+                Log.d("Rname", resp_fname);
                 // This is an error case
                 // TODO: handle this
             }
+            Log.d("RTS", "Done with RTS");
         } catch (FileNotFoundException e) {
             //catch logic
         } catch (IOException e) {
