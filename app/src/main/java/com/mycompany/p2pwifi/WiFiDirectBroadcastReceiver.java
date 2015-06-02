@@ -54,6 +54,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 Log.d("connected", "I am group owner.");
             }
             //Log.d("connected", String.format("connected to device with host: %s", hostAddress));
+
             // After the group negotiation, we can determine the group owner.
             if (info.groupFormed && info.isGroupOwner) {
                 // Do whatever tasks are specific to the group owner.
@@ -62,7 +63,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 SimpleServer server = new SimpleServer(mActivity.getApplicationContext(), null);
                 server.execute();
 
-            } else if (info.groupFormed) {
+            } else if (info.groupFormed ) {
                 // The other device acts as the client. In this case,
                 // you'll want to create a client thread that connects to the group
                 // owner.

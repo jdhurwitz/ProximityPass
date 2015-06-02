@@ -1,23 +1,18 @@
 package com.mycompany.p2pwifi;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.util.Arrays;
-import android.telephony.TelephonyManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -78,8 +73,6 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
     @Override
     protected String doInBackground(Void... params) {
         try {
-            Log.d("server", "Server has started.");
-
 
             /**
              * Create a server socket and wait for client connections. This

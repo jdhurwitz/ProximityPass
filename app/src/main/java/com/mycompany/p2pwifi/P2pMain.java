@@ -35,6 +35,8 @@ public class P2pMain extends Activity {
     private List peerNames = new ArrayList();
     private ArrayAdapter<String> adapter;
 
+    private WifiP2pConfig config = new WifiP2pConfig();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,8 @@ public class P2pMain extends Activity {
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
         mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+        config.groupOwnerIntent = 15;
+
 
         peers = mReceiver.get_peers();
         peerNames = mReceiver.get_peerNames();
@@ -147,7 +151,9 @@ public class P2pMain extends Activity {
 
         WifiP2pDevice device = (WifiP2pDevice) peers.get(position);
 
-        WifiP2pConfig config = new WifiP2pConfig();
+        //WifiP2pConfig config = new WifiP2pConfig();
+        config.groupOwnerIntent = 0;
+
         config.deviceAddress = device.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
 
