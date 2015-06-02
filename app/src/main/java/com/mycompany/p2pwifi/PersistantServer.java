@@ -8,6 +8,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.SystemClock; // DEBUG
+import java.net.InetSocketAddress;
+import java.lang.Runnable;
+import android.app.Activity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,20 +25,46 @@ import java.net.Socket;
 /**
  * Created by Jonny on 5/30/15.
  */
-public class SimpleServer extends AsyncTask<Void,Void,String> {
-    //Make sure to include a package including Transaction.java
+public class PersistantServer extends AsyncTask<Void,Void,String> {
 
+    private int lock;
+    private Context context;
+    private Activity activity;
     private static final int PORT = 8888;
     // private Set<Transaction> all_transactions;
-    private Context context;
-    private TextView statusText;
-
-    public SimpleServer(Context context, View statusText) {
-
-        this.context = context;
-        this.statusText = (TextView) statusText;
+    public PersistantServer(Context ctx, Activity act)
+    {
+        this.lock = 0;
+        this.context = ctx;
+        this.activity = act;
         // this.all_transactions = new HashSet();
     }
+
+    @Override
+    protected String doInBackground(Void... params) {
+        // Keep listening for connections
+        try {
+            for (;;) // infinite loop
+            {
+                Log.d("Server", "Starting server " + Integer.toString(this.lock));
+                listen_for_connection();
+                // SystemClock.sleep(7000);
+                Log.d("Server", "Closing server " + Integer.toString(this.lock));
+                this.lock = this.lock + 1;
+            }
+        }
+        catch (Exception e) {
+            Log.d("Exception", e.toString());
+        }
+        return null; // never reached
+    }
+
+
+    // public SimpleServer(Context context) {
+    //     this.context = context;
+    //     // this.statusText = (TextView) statusText;
+    //     // this.all_transactions = new HashSet();
+    // }
 
     private String getMyPhoneNumber()
     {
@@ -43,7 +73,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
         return ret;
     }
 
-    public static boolean copyStream(InputStream in, OutputStream out, int maxSize) {
+    private static boolean copyStream(InputStream in, OutputStream out, int maxSize) {
         int bufSize = 1024;
         byte buf[] = new byte[bufSize];
         int len;
@@ -70,15 +100,24 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
         return true;
     }
 
-    @Override
-    protected String doInBackground(Void... params) {
+    protected String listen_for_connection() {
         try {
+            Log.d("Simple server", "listen_for_connection");
 
             /**
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client
              */
-            ServerSocket serverSocket = new ServerSocket(PORT);
+            // ServerSocket serverSocket = new ServerSocket(PORT);
+            // Log.d("Simple server", "line 2");
+            // Socket client = serverSocket.accept();
+            // Log.d("Simple server", "line 3");
+            ServerSocket serverSocket = new ServerSocket();
+            Log.d("Simple server", "line 2");
+            serverSocket.setReuseAddress(true);
+            Log.d("Simple server", "line 3");
+            serverSocket.bind(new InetSocketAddress(PORT));
+            Log.d("Simple server", "line 4");
             Socket client = serverSocket.accept();
 
             /**
@@ -155,6 +194,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                     outputstream.write(buf);
                 }
                 outputstream.close();
+                serverSocket.close();
 
                 // update transaction state
                 // all_transactions.remove(cur);
@@ -184,6 +224,7 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                     outputstream.write(buf);
                 }
                 outputstream.close();
+                serverSocket.close();
 
                 // update transaction
             }
@@ -238,17 +279,24 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
                 // remove transaction
 
                 // Indicate success with the filepath
+                after_file_transfer(f.getAbsolutePath() );
                 return f.getAbsolutePath();
             }
             else
+            {
                 Log.d("FFT", "You reached      ELSE CASE");
+                serverSocket.close();
+            }
 
 
             return null;
         } catch (IOException e) {
-            //Log.e(WiFiDirectActivity.TAG, e.getMessage());
+            Log.d("Server", e.getMessage());
             return null;
         } catch (NumberFormatException e) {
+            Log.d("Server", e.getMessage());
+            return null;
+        } catch (Exception e) {
             Log.d("Server", e.getMessage());
             return null;
         }
@@ -257,11 +305,17 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
     /**
      * Start activity that can handle the JPEG image
      */
-    @Override
-    protected void onPostExecute(String result) {
+    protected void after_file_transfer(String result) {
         if (result != null) {
-            //statusText.setText("File copied - " + result);
-            Toast.makeText(context, "File copied - " + result, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(context, "File copied - " + result, Toast.LENGTH_SHORT).show();
+            final String fname = result; // leaves at full path
+            // Activity act = (Activity) this.context;
+            this.activity.runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(context, "File copied - " + fname, Toast.LENGTH_LONG).show();
+                }
+            });
+
             // Intent intent = new Intent();
             // intent.setAction(android.content.Intent.ACTION_VIEW);
             // intent.setDataAndType(Uri.parse("file://" + result), "image/*");
@@ -269,4 +323,3 @@ public class SimpleServer extends AsyncTask<Void,Void,String> {
         }
     }
 }
-

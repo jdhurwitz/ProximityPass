@@ -60,7 +60,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // Do whatever tasks are specific to the group owner.
                 // One common case is creating a server thread and accepting
                 // incoming connections.
-                SimpleServer server = new SimpleServer(mActivity.getApplicationContext(), null);
+                PersistantServer server = new PersistantServer(mActivity.getApplicationContext(), mActivity);
                 server.execute();
 
             } else if (info.groupFormed ) {

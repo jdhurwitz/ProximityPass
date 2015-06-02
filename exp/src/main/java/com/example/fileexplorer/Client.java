@@ -52,7 +52,7 @@ public class Client extends Activity {
         protected void onPostExecute(String result) {
             if (result != null) {
                 //statusText.setText("File copied - " + result);
-                Toast.makeText(context, "File sent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "File sent", Toast.LENGTH_LONG).show();
                 // Intent intent = new Intent();
                 // intent.setAction(android.content.Intent.ACTION_VIEW);
                 // intent.setDataAndType(Uri.parse("file://" + result), "image/*");
@@ -96,8 +96,11 @@ public class Client extends Activity {
              * Create a client socket with the host,
              * port, and timeout information.
              */
+            socket.setReuseAddress(true);
             socket.bind(null);
+            Log.d("RTS", "After socket bind");
             socket.connect((new InetSocketAddress(host, PORT)), 500);
+            Log.d("RTS", "After socket connect");
 
             // /**
             //  * Create a byte stream from a JPEG file and pipe it to the output stream
