@@ -29,7 +29,7 @@ public class FileChooser extends ListActivity {
     private void fill(File f)
     {
         File[]dirs = f.listFiles();
-         this.setTitle("Current Dir: "+f.getName());
+         this.setTitle("Currently In: "+f.getName());
          List<Item>dir = new ArrayList<Item>();
          List<Item>fls = new ArrayList<Item>();
          try{
@@ -68,7 +68,7 @@ public class FileChooser extends ListActivity {
          Collections.sort(fls);
          dir.addAll(fls);
          if(!f.getName().equalsIgnoreCase("sdcard"))
-             dir.add(0,new Item("..","Parent Directory","",f.getParent(),"directory_up"));
+             dir.add(0,new Item("Return to Previous Directory","Full Path: "+currentDir,"",f.getParent(),"directory_up"));
          adapter = new FileArrayAdapter(FileChooser.this,R.layout.file_view,dir);
          this.setListAdapter(adapter);
     }

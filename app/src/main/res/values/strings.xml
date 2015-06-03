@@ -1,6 +1,13 @@
 <resources>
-    <string name="app_name">P2PWifi</string>
+    <string name="app_name">Proximity Pass</string>
+    <string name="send_file"><b>Sending:</b> Click on user, select file.
+    </string>
+    <string name="receive_file"><b>Receiving:</b> Wait for sender\'s prompt to transfer.
 
+    </string>
+    <string name="note"><![CDATA[<b>Note: </b>You can transfer multiple files to a user in a session.]]>
+
+    </string>
     <string name="discover_peers">Discover Peers</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Help/Tutorial</string>
 </resources>

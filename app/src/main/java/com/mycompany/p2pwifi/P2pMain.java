@@ -2,6 +2,7 @@ package com.mycompany.p2pwifi;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WpsInfo;
@@ -9,6 +10,7 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -114,6 +116,25 @@ public class P2pMain extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //Open dialog box
+            new android.app.AlertDialog.Builder(P2pMain.this)
+                    .setTitle("Help Menu")
+                    .setMessage(Html.fromHtml(getString(R.string.send_file)) + "\n"
+                    +Html.fromHtml(getString(R.string.receive_file)) + "\n"
+                    +Html.fromHtml(getString(R.string.note)))
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // continue with delete
+                        }
+                    })
+                     //Negative button not necessary, help menu is only for help
+                   /* .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })*/
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
             return true;
         }
 
