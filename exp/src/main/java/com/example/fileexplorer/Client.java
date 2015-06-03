@@ -211,7 +211,8 @@ public class Client extends Activity {
         Log.d("Client", "File is: " + file_name);
         int len;
         Socket socket = new Socket();
-        byte buf[]  = new byte[1024];
+        int bufSize = 1024;
+        byte buf[]  = new byte[bufSize];
         // ...
         // Set host
         // Use defined port no.
@@ -254,12 +255,15 @@ public class Client extends Activity {
             try
             {
                 while ((len = file_in_stream.read(buf)) != -1) {
-                    // network_output.write(buf, 0, 1024);
-
                     // buf stores the next several bytes from the file
-
                     String BufString = new String(buf);
-                    Log.d("Buffer:", BufString);
+                    // Log.d("Buffer:", BufString);
+                    // Log.d("Len:", Integer.toString(len) );
+                    if (len < bufSize)
+                    {
+                        BufString = BufString.substring(0, len);
+                        // Log.d("CHECK THIS OUT", "Sliced string is: <" + BufString + ">");
+                    }
                     dataString += BufString;
                 }
             }
