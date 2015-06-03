@@ -169,7 +169,7 @@ public class Client extends Activity {
                 {
                     // This is an error case
                     // TODO: handle this
-                    Log.d("Error", "This is an error case");
+                    Log.d("Failure", "I got denied");
                 }
             }
             else
@@ -257,12 +257,13 @@ public class Client extends Activity {
                 while ((len = file_in_stream.read(buf)) != -1) {
                     // buf stores the next several bytes from the file
                     String BufString = new String(buf);
+                    // String BufString = Base64.encodeToString(buf, 0);
                     // Log.d("Buffer:", BufString);
-                    // Log.d("Len:", Integer.toString(len) );
+                    Log.d("Len:", Integer.toString(len) );
                     if (len < bufSize)
                     {
                         BufString = BufString.substring(0, len);
-                        // Log.d("CHECK THIS OUT", "Sliced string is: <" + BufString + ">");
+                        Log.d("CHECK THIS OUT", "Sliced string is: <" + BufString + ">");
                     }
                     dataString += BufString;
                 }
@@ -276,6 +277,7 @@ public class Client extends Activity {
             // Now dataString is complete
             String outputString = headerString + dataString;
             byte outputBuf[] = outputString.getBytes();
+            Log.d("Length", Integer.toString(outputBuf.length) );
             // network_output.write(outputBuf, 0, 1024);
             network_output.write(outputBuf); // Write entire buffer to network
 
@@ -388,6 +390,7 @@ public class Client extends Activity {
                 {
                     // This is an error case
                     // TODO: handle this
+                    Log.d("Failure", "I got denied");
                 }
             }
             else

@@ -12,6 +12,10 @@ import android.os.SystemClock; // DEBUG
 import java.net.InetSocketAddress;
 import java.lang.Runnable;
 import android.app.Activity;
+// import android.util.Base64.Decoder;
+// import android.util.Base64;
+import java.util.*;
+import android.content.DialogInterface;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,16 +32,18 @@ import java.net.Socket;
 public class PersistantServer extends AsyncTask<Void,Void,String> {
 
     private int lock;
+    private boolean ret;
+    private int counter;
     private Context context;
     private Activity activity;
     private static final int PORT = 8888;
-    // private Set<Transaction> all_transactions;
+    private Set<Transaction> all_transactions;
     public PersistantServer(Context ctx, Activity act)
     {
-        this.lock = 0;
+        this.counter = 0;
         this.context = ctx;
         this.activity = act;
-        // this.all_transactions = new HashSet();
+        this.all_transactions = new HashSet();
     }
 
     @Override
@@ -46,11 +52,11 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
         try {
             for (;;) // infinite loop
             {
-                Log.d("Server", "Starting server " + Integer.toString(this.lock));
+                Log.d("Server", "Starting server " + Integer.toString(this.counter));
                 listen_for_connection();
                 // SystemClock.sleep(7000);
-                Log.d("Server", "Closing server " + Integer.toString(this.lock));
-                this.lock = this.lock + 1;
+                Log.d("Server", "Closing server " + Integer.toString(this.counter));
+                this.counter = this.counter + 1;
             }
         }
         catch (Exception e) {
@@ -60,12 +66,6 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
     }
 
 
-    // public SimpleServer(Context context) {
-    //     this.context = context;
-    //     // this.statusText = (TextView) statusText;
-    //     // this.all_transactions = new HashSet();
-    // }
-
     private String getMyPhoneNumber()
     {
         TelephonyManager tMgr = (TelephonyManager)this.context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -74,6 +74,7 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
     }
 
     private static boolean copyStream(InputStream in, OutputStream out, int maxSize) {
+        // Log.d("Copy Stream", Integer.toString(maxSize) );
         int bufSize = 1024;
         byte buf[] = new byte[bufSize];
         int len;
@@ -88,21 +89,59 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
             while ((len = in.read(buf)) != -1 && amt_read < maxSize)
             {
                 out.write(buf, 0, len);
-                Log.d("Buffer:", new String(buf) );
+                // Log.d("Buffer:", new String(buf) );
                 amt_read += len;
             }
+            // Log.d("CS", "Should leave "+Integer.toString(amt_read));
             out.close();
             in.close();
+            // Log.d("Copy Stream", Integer.toString(amt_read) );
         } catch (IOException e) {
             // Log.d(WiFiDirectActivity.TAG, e.toString());
+            Log.d("Copy Stream Error", e.toString() );
             return false;
         }
         return true;
     }
 
+    private boolean ask_for_confirmation(String phone, String fname)
+    {
+        this.lock = 1;
+        this.ret = true;
+        final String f_fname = fname;
+        final String f_phone = phone;
+        this.activity.runOnUiThread(new Runnable() {
+            public void run()
+            {
+                new android.app.AlertDialog.Builder(activity)
+                .setTitle("Incoming file")
+                .setMessage("Would you like to receive "+f_fname+" from "+f_phone+"?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                        ret = true;
+                        lock = 0;
+                    }
+                })
+                // Negative button not necessary, help menu is only for help
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                        ret = false;
+                        lock = 0;
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+            }
+        });
+        while (this.lock == 1);
+        return this.ret; // TODO
+    }
+
     protected String listen_for_connection() {
         try {
-            Log.d("Simple server", "listen_for_connection");
+            // Log.d("Simple server", "listen_for_connection");
 
             /**
              * Create a server socket and wait for client connections. This
@@ -113,12 +152,11 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
             // Socket client = serverSocket.accept();
             // Log.d("Simple server", "line 3");
             ServerSocket serverSocket = new ServerSocket();
-            Log.d("Simple server", "line 2");
             serverSocket.setReuseAddress(true);
-            Log.d("Simple server", "line 3");
             serverSocket.bind(new InetSocketAddress(PORT));
-            Log.d("Simple server", "line 4");
+            // Log.d("Simple server", "Accepting connection");
             Socket client = serverSocket.accept();
+            Log.d("Simple server", "Connection established");
 
             /**
              * If this code is reached, a client has connected and
@@ -151,39 +189,36 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
             String file_name = "";
             while ( (ch = clientInput.read()) != newlineByte)
                 file_name += (char)ch;
-            Log.d("Server", "File name: " + file_name);
+            // Log.d("Server", "File name: " + file_name);
             String file_size_str = "";
             while ( (ch = clientInput.read()) != newlineByte)
                 file_size_str += (char)ch;
-            Log.d("Server", file_size_str);
+            // Log.d("Server", file_size_str);
             int file_size = Integer.parseInt(file_size_str);
-            if (file_size == 5)
-                Log.d("File size", "File size converted to 5");
-            else
-                Log.d("File size", "File size is wrong");
 
-            // // Build a Transaction
-            // Transaction cur = new Transaction(phone_no, file_name, file_size);
+            // Build a Transaction
+            Transaction cur = new Transaction(phone_no, file_name, file_size);
 
-            // if (all_transactions.contains(cur))
-            // {
-            //     // remove it from set
-            //     all_transactions.remove(cur);
-            //     // add updated Transaction
-            //     all_transactions.add(cur);
-            // }
+            if (all_transactions.contains(cur))
+            {
+                Log.d("Trans", "Duplicate transaction!");
+                // remove it from set
+                all_transactions.remove(cur);
+                // add updated Transaction
+                all_transactions.add(cur);
+            }
 
             // Handle different requests differently
             if (request_type.equals("RTS") )
             {
-                Log.d("FFT", "You reached rts");
-                // // create transaction
-                // cur.updateStage(0);
-                // all_transactions.add(cur);
+                // Log.d("FFT", "You reached rts");
+                // create transaction
+                cur.updateStage(0);
+                all_transactions.add(cur);
 
                 // get user approval or automatically request preview
                 // Assume we must get user approval
-                boolean approval = true; // hard coded for now
+                boolean approval = ask_for_confirmation(phone_no, file_name);
 
                 String my_phone_no = getMyPhoneNumber();
                 if (approval)
@@ -192,18 +227,34 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
                     String dataString = "CTS\n"+my_phone_no+"\n"+file_name+"\n"+file_size_str+"\n";
                     byte buf[] = dataString.getBytes();
                     outputstream.write(buf);
+                    Log.d("Approval", "APPROVED!!!");
+                }
+                else
+                {
+                    String dataString = "DTS\n"+my_phone_no+"\n"+file_name+"\n"+file_size_str+"\n";
+                    byte buf[] = dataString.getBytes();
+                    outputstream.write(buf);
+                    Log.d("Approval", "DENIED");
                 }
                 outputstream.close();
                 serverSocket.close();
 
                 // update transaction state
-                // all_transactions.remove(cur);
-                // cur.updateStage(1);
-                // all_transactions.add(cur);
+                boolean isRemoved = all_transactions.remove(cur);
+                if (!isRemoved)
+                    Log.d("Set", "Wasn't removed (bad)");
+                else
+                    Log.d("Set", "Successfull removed!");
+                cur.updateStage(1);
+                boolean isAdded = all_transactions.add(cur);
+                if (!isAdded)
+                    Log.d("Set", "Wasn't added (bad)");
+                else
+                    Log.d("Set", "Successfull added!");
             }
             else if (request_type.equals("RTP") )
             {
-                Log.d("FFT", "You reached rtp");
+                // Log.d("FFT", "You reached rtp");
                 // // update transaction
                 // if (!all_transactions.contains(cur))
                 // {
@@ -230,32 +281,36 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
             }
             else if (request_type.equals("FFT") )
             {
-                Log.d("FFT", "You reached FFT");
-                // // update transaction
-                // if (!all_transactions.contains(cur))
-                // {
-                //     // Throw an exception
-                // }
-                // Iterator<Transaction> it = all_transactions.iterator();
-                // boolean valid = false;
-                // while (it.hasNext())
-                // {
-                //     Transaction tmp = it.next();
-                //     if (!tmp.equals(cur))
-                //         continue;
-                //     else
-                //     {
-                //         if (tmp.stage() != 1)
-                //         {
-                //             // Throw an exception, this was never confirmed
-                //         }
-                //         else
-                //         {
-                //             valid = true;
-                //             break;
-                //         }
-                //     }
-                // }
+                // Log.d("FFT", "You reached FFT");
+                // update transaction
+                if (!all_transactions.contains(cur))
+                {
+                    // Throw an exception
+                    Log.d("Transaction", "It isn't there");
+                    Log.d("Set", "Size: "+Integer.toString(all_transactions.size()));
+                    // Weird, it has 1 element, but it isn't the transaction we're looking for
+                }
+                Iterator<Transaction> it = all_transactions.iterator();
+                boolean valid = false;
+                while (it.hasNext())
+                {
+                    Transaction tmp = it.next();
+                    if (!tmp.equals(cur))
+                        continue;
+                    else
+                    {
+                        if (tmp.stage() != 1)
+                        {
+                            // Throw an exception, this was never confirmed
+                            Log.d("Transaction", "This transaction wasn't confirmed!!!!!!");
+                        }
+                        else
+                        {
+                            valid = true;
+                            break;
+                        }
+                    }
+                }
 
                 // if (!valid) // should be redundant
                 // {
@@ -284,7 +339,7 @@ public class PersistantServer extends AsyncTask<Void,Void,String> {
             }
             else
             {
-                Log.d("FFT", "You reached      ELSE CASE");
+                // Log.d("FFT", "You reached      ELSE CASE");
                 serverSocket.close();
             }
 
