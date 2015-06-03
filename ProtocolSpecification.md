@@ -4,9 +4,18 @@ Proximity Pass Protocol Specification
 About the protocol
 ------------------
 
-This is a protocol to quickly transmit files over Bluetooth and ad hoc wifi
-between two android devices. This is intended to be similar in functionality
-to the Airdrop protocol for iOS devices.
+This is a protocol to quickly transmit files over ad hoc wifi between two
+android devices. This is intended to be similar in functionality to the
+Airdrop protocol for iOS devices.
+
+### Phyiscal layer
+
+All communication will be done over ad hoc wifi.
+
+### Transport layer
+
+All compatible clients must connect over TCP connections. They should
+connect on port 8888.
 
 Discovering devices
 -------------------
@@ -138,4 +147,4 @@ FFT\n
 Note: this packet should not end in a newline character. This is for
 convenience when storing the data on disk.
 
-The server does not need to reply
+The server should not not reply to an `FFT` request.
