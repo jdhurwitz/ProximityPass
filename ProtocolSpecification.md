@@ -28,21 +28,6 @@ The end goal is to buid a list of phone numbers and the associated IP
 addresses of nearby devices. This list can be used by the sender to identify
 nearby devices and select which device to send a file to.
 
-After the client establishes connections to each server nearby, each server
-will respond with a message of the following form:
-
-```
-EST\n
-<IP address>\n
-<Phone number>\n
-```
-
-This message (sent to the client's IP) will allow the client to form a
-recipient profile for this recipient, identifying them by both phone number
-and IP address. This will allow the client to recognize users of the devices
-(using phone number, based on address book), as well as send the data to the
-server process (using the IP address)
-
 Handshake
 ---------
 
@@ -62,12 +47,12 @@ An example such packet would look like:
 
 ```
 RTS\n
-13101234567
-May-5-2015-030603.jpg
-73700
+13101234567\n
+May-5-2015-030603.jpg\n
+73700\n
 ```
 
-The recipient must respond with a `confirm-to-send` in the following manner,
+The recipient **may** respond with a `confirm-to-send` in the following manner,
 in plain text:
 
 ```
@@ -81,15 +66,29 @@ An example such packet would look like:
 
 ```
 CTS\n
-13109876543
-May-5-2015-030603.jpg
-73700
+13109876543\n
+May-5-2015-030603.jpg\n
+73700\n
 ```
 
 The file name is echoed back for redundancy, to make sure that the sender
 knows which file has been confirmed. File size is similarly listed for
 redundancy, as a way for the recipient to confirm that it has sufficient
 storage capacity to save the file.
+
+The receiver **may instead** choose to respond with a `deny-to-send`
+response. This sends the opposite signal of a `CTS`: the client is not
+permitted to send the file.
+
+An example response looks as follows (the only difference is the response
+field):
+
+```
+DTS\n
+<receiver's phone-number>\n
+<file name>\n
+<size in bytes of file>\n
+```
 
 ### Handshaking pt. 2 (optional)
 
@@ -103,7 +102,7 @@ is of the same format, but may optionally be responded to with a
 RFP\n
 <receiver's phone-number>\n
 <file name>\n
-PREVIEW\n
+<size in bytes of file>\n
 ```
 
 The sender must then respond with a `response-to-preview` as follows:
@@ -136,11 +135,7 @@ FFT\n
 <Raw file data>
 ```
 
-The server will then reply to this with the following packet:
+Note: this packet should not end in a newline character. This is for
+convenience when storing the data on disk.
 
-```
-FIN\n
-<recipient's phone-number>\n
-<file name>\n
-<size in bytes of file>\n
-```
+The server does not need to reply
