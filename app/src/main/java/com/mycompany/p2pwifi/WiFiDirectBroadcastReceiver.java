@@ -51,7 +51,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
             String hostAddress = "";
-            if(info != null) {
+            if(info.groupOwnerAddress != null) {
                  hostAddress = info.groupOwnerAddress.getHostAddress();
             }
             if(info.isGroupOwner) {

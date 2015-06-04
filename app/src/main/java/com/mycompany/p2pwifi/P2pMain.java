@@ -82,8 +82,8 @@ public class P2pMain extends Activity implements Serializable{
         super.onResume();
         registerReceiver(mReceiver, intentFilter);
 
-        //cancel_connection();
-        //Intent i= new Intent(P2pMain.this,P2pMain.class);
+        cancel_connection();
+        //startActivity(i);
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -210,18 +210,32 @@ public class P2pMain extends Activity implements Serializable{
     }
 
     public void cancel_connection(){
-        this.mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener(){
+        this.mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess(){
+            public void onSuccess() {
                 Log.d("Remove", "removeGroup onSuccess");
+                Intent i= new Intent(P2pMain.this,P2pMain.class);
+                startActivity(i);
+            }
+                @Override
+                public void onFailure ( int reason){
+                    Log.d("Remove", "Failure, reason: " + reason);
 
+                    mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d("wifi", "onsuccess");
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            Log.d("wifi", "onfailure");
+                        }
+                    });
+                }
             }
 
-            @Override
-            public void onFailure(int reason){
-                Log.d("Remove", "Failure, reason: " + reason);
-            }
-        });
+            );
+        }
+
     }
-
-}

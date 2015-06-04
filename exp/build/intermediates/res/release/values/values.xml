@@ -2,7 +2,7 @@
 <resources>
     <!-- From: file:/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="Home">Home</string>
+    <string name="Home">Reset</string>
     <string name="app_name">Fileexplorer</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_fileexplorer">FileexplorerActivity</string>
