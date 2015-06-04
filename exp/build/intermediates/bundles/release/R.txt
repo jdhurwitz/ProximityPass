@@ -15,8 +15,8 @@ int id textview 0x7f070000
 int layout activity_fileexplorer 0x7f030000
 int layout file_view 0x7f030001
 int menu activity_fileexplorer 0x7f060000
-int string app_name 0x7f050000
-int string hello_world 0x7f050001
-int string menu_settings 0x7f050002
+int string Home 0x7f050000
+int string app_name 0x7f050001
+int string hello_world 0x7f050002
 int string title_activity_fileexplorer 0x7f050003
 int style AppTheme 0x7f040000

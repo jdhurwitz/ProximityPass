@@ -2,9 +2,9 @@
 <resources>
     <!-- From: file:/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="Home">Reset</string>
     <string name="app_name">Fileexplorer</string>
     <string name="hello_world">Hello world!</string>
-    <string name="menu_settings">Settings</string>
     <string name="title_activity_fileexplorer">FileexplorerActivity</string>
     <!-- From: file:/Users/Jonny/AndroidStudioProjects/P2PWifi-master/exp/src/main/res/values/styles.xml -->
     <eat-comment/>
