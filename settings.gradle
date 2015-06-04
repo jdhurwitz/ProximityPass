@@ -1,1 +1,1 @@
-include ':app', ':exp'
+include ':app', ':exp', ':sp'

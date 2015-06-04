@@ -21,10 +21,11 @@ import android.widget.ListView;
 
 import com.example.fileexplorer.FileChooser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class P2pMain extends Activity {
+public class P2pMain extends Activity implements Serializable{
 
     ListView listView;
 
@@ -80,6 +81,9 @@ public class P2pMain extends Activity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, intentFilter);
+
+        //cancel_connection();
+        //Intent i= new Intent(P2pMain.this,P2pMain.class);
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -91,6 +95,7 @@ public class P2pMain extends Activity {
                 Log.d("wifi", "onfailure");
             }
         });
+
     }
 
     @Override
@@ -120,14 +125,14 @@ public class P2pMain extends Activity {
             new android.app.AlertDialog.Builder(P2pMain.this)
                     .setTitle("Help Menu")
                     .setMessage(Html.fromHtml(getString(R.string.send_file)) + "\n"
-                    +Html.fromHtml(getString(R.string.receive_file)) + "\n"
-                    +Html.fromHtml(getString(R.string.note)))
+                            +Html.fromHtml(getString(R.string.receive_file)) + "\n"
+                            +Html.fromHtml(getString(R.string.note)))
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // continue with delete
                         }
                     })
-                     //Negative button not necessary, help menu is only for help
+                            //Negative button not necessary, help menu is only for help
                    /* .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // do nothing
@@ -155,13 +160,11 @@ public class P2pMain extends Activity {
             public void onSuccess() {
                 Log.d("wifi", "onsuccess");
             }
-
             @Override
             public void onFailure(int reason) {
                 Log.d("wifi", "onfailure");
             }
         });
-
     }*/
 
     public void update_list() {
@@ -199,6 +202,26 @@ public class P2pMain extends Activity {
     public void start_file_chooser(String hostAddress) {
         Intent intent = new Intent(this, FileChooser.class);
         intent.putExtra("serverIP", hostAddress); //pass the host address to the file chooser
+
+        //intent.putExtra("manager", mManager);
+        //intent.putExtra("channel", mChannel);
+        //intent.putExtra("P2pMain", this);
         startActivity(intent);
     }
+
+    public void cancel_connection(){
+        this.mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener(){
+            @Override
+            public void onSuccess(){
+                Log.d("Remove", "removeGroup onSuccess");
+
+            }
+
+            @Override
+            public void onFailure(int reason){
+                Log.d("Remove", "Failure, reason: " + reason);
+            }
+        });
+    }
+
 }

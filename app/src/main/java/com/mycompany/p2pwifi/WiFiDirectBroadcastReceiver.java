@@ -47,9 +47,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     };
 
     private WifiP2pManager.ConnectionInfoListener connectionListener = new WifiP2pManager.ConnectionInfoListener() {
+
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-            String hostAddress = info.groupOwnerAddress.getHostAddress();
+            String hostAddress = "";
+            if(info != null) {
+                 hostAddress = info.groupOwnerAddress.getHostAddress();
+            }
             if(info.isGroupOwner) {
                 Log.d("connected", "I am group owner.");
             }

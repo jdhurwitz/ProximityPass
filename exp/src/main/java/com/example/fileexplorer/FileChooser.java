@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+
+
 public class FileChooser extends ListActivity {
 
     private File currentDir;
@@ -26,6 +31,32 @@ public class FileChooser extends ListActivity {
         currentDir = new File(Environment.getExternalStorageDirectory(), "");
         fill(currentDir);
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; Add items to menu bar.
+        getMenuInflater().inflate(R.menu.activity_fileexplorer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        //action bar button to go home
+        if (id == R.id.menu_settings) {
+            //Want to return to the main activity and finish this activity
+            //Intent home = new Intent(this, P2pMain.class);
+            //P2pMain p = getIntent().getSerializableExtra("P2pMain").cancel_connection();
+            //startActivity(home);
+            //this.finish();
+            super.onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void fill(File f)
     {
         File[]dirs = f.listFiles();
