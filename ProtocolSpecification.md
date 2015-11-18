@@ -8,7 +8,7 @@ This is a protocol to quickly transmit files over ad hoc wifi between two
 android devices. This is intended to be similar in functionality to the
 Airdrop protocol for iOS devices.
 
-### Phyiscal layer
+### Physical layer
 
 All communication will be done over ad hoc wifi.
 
@@ -33,7 +33,7 @@ What if I share my phone number on a network with strangers?
 
 ### The goal of this part of the protocol
 
-The end goal is to buid a list of phone numbers and the associated IP
+The end goal is to build a list of phone numbers and the associated IP
 addresses of nearby devices. This list can be used by the sender to identify
 nearby devices and select which device to send a file to.
 
