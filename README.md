@@ -27,7 +27,7 @@ communication happens over ad hoc wifi. We chose to use wifi as the standard, as
 opposed to Bluetooth or NFC for the following reasons:
 
  1. Wifi is available on essentially every smart phone.
- 2. Not all phones have NFC capability, so this illuminates the need for that.
+ 2. Not all phones have NFC capability, so this eliminates the need for that.
  3. P2P Wifi supports faster data transfer than Bluetooth 4.0 (roughly 250 Mbps
     vs 25 Mbps)
 
